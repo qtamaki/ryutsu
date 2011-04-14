@@ -1,1 +1,6 @@
-This file was created by IntelliJ IDEA 10.0.2 for binding GitHub repository
+Scala勉強会第29回 in 秋葉原で使用した資料とソースコードです。
+未熟ものですいません。
+
+とりあえず、HTMLのパースは↓がよいっぽい。
+@chimerast
+Java(Scala?)でのHTML解析はJericho + Jaxenがおすすめ。HTMLをXPathで抽出できる。つなぎこみを書く必要があるが、→のサイトを参考に。 http://t.co/teJPWsW #rpscala

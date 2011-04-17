@@ -9,6 +9,7 @@
 class RegexTest1
 
 object RegexTest1 {
+/*
   def main(args: Array[String]) = {
     val ptn1 = """(?m)abc\ndef""".r;
     println("ptn1:" + ptn1.findAllIn("abc\ndef").toList.toString)
@@ -21,4 +22,5 @@ object RegexTest1 {
     }
     */
   }
+*/
 }

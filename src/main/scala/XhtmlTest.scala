@@ -14,10 +14,11 @@ import scala.xml.parsing.XhtmlParser
 class XhtmlTest
 
 object XhtmlTest {
+/*
   def main(args: Array[String]) = {
-    val httpclient = new DefaultHttpClient();
-//    val httpget = new HttpGet("http://www.apache.org/");
-    val httpget = new HttpGet("http://www.ryutsuu.biz/");
+
+     
+    val So HttpGet("http://www.ryutsuu.biz/");
     println("executing request " + httpget.getURI());
     val response = httpclient.execute(httpget);
     println("----------------------------------------");
@@ -41,5 +42,7 @@ object XhtmlTest {
       var xhtml = XhtmlParser(source)
       println((xhtml \\ "li").toString)
     }
+
   }
+*/
 }

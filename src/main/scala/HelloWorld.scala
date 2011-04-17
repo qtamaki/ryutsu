@@ -7,20 +7,76 @@
  */
 
 import java.io.{InputStream, InputStreamReader, BufferedReader}
+import java.net.URL
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.{ HttpEntity, HttpResponse }
+import org.apache.http.client.HttpClient
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.util.EntityUtils
 import scala.xml._
-;
+import scala.io.Source
 
 class HelloWorld
 
 object HelloWorld {
   /**
+   * HTMLエスケープ(& -> &amp;)するユーティリティ
+   */
+  def h(x: String) = StringEscapeUtils.escapeHtml(x)
+
+  /**
+   * RSSの個別のItemを生成
+   * XMLリテラルを使っているけどあってるのか!?
+   */
+  def toRssDetail(link: String, title: String, description: String) = 
+<item>
+	<title>{h(title)}</title>
+	<link>{h(link)}</link>
+	<description>{h(description)}</description>
+</item>
+
+  /**
+   * RSS生成
+   * Detailの生成が強引
+   */
+  def toRss(list: List[List[String]]) = 
+<rss version="2.0">
+<channel>
+ <title>流通ニュース</title>
+ <link><![CDATA[http://www.ryutsuu.biz]]></link>
+   <description><![CDATA[]]></description>
+  {for(x <- list)yield toRssDetail(x(0), x(1), "")}
+<language><![CDATA[ja]]></language>
+</channel>
+</rss>
+  
+
+  /**
+   * メイン
+   */
+  def main(args: Array[String]) = {
+    println("Hello, world!!")
+
+    val str = Source.fromURL(new URL("http://www.ryutsuu.biz/"), "utf8") getLines() map { _ + "\n" } mkString
+
+    // ust 聞き逃していてここで何をしたいのかが分かっていない・・・
+
+    val ptn2 = """(?s)\<ul\>.*?\<\/ul\>""".r
+
+    val ul = ptn2.findAllIn(str).toList(2)
+    val xx = """\&""".r.replaceAllIn(ul,"&amp;")
+
+    val elem2 = XML.loadString(xx)
+    
+    val list = elem2 \\ "a" map { a => List(a.attribute("href") map { _.toString } getOrElse(""), a.text) }
+
+    assert("""<?xml version="1.0" encoding="UTF-8"?>""" + toRss(list.toList).toString == get)
+    
+    println("""<?xml version="1.0" encoding="UTF-8"?>""" + toRss(list.toList).toString)
+    println("こんにちわ。世界!!");
+  }
+    /**
    *  InputStreamをStringに変換するユーティリティ
    */
   def inputStreamToString(in: InputStream): String = {
@@ -37,50 +93,11 @@ object HelloWorld {
     return buf.toString();
   }
 
-  /**
-   * HTMLエスケープ(& -> &amp;)するユーティリティ
-   */
-  def h(x: String) = StringEscapeUtils.escapeHtml(x)
-
-  /**
-   * RSSの個別のItemを生成
-   * XMLリテラルを使っているけどあってるのか!?
-   */
-  def toRssDetail(link: String, title: String, description: String) = {
-<item>
-	<title>{h(title)}</title>
-	<link>{h(link)}</link>
-	<description>{h(description)}</description>
-</item>
-  }
-
-  /**
-   * RSS生成
-   * Detailの生成が強引
-   */
-  def toRss(list: List[List[String]]) = {
-<rss version="2.0">
-<channel>
- <title>流通ニュース</title>
- <link><![CDATA[http://www.ryutsuu.biz]]></link>
-   <description><![CDATA[]]></description>
-  {for(x <- list)yield toRssDetail(x.head, x.tail.head, "")}
-<language><![CDATA[ja]]></language>
-</channel>
-</rss>
-  }
-
-  /**
-   * メイン
-   */
-  def main(args: Array[String]) = {
-    // Hello!!
-    println("Hello, world!!")
-
     /**
      * HTTPクライアントを生成して、HTMLを取得している
      * 疑問: HTTPクライアントは、org.apache.http.client.HttpClientでよいの？
      */
+  def get = { 
     val httpclient = new DefaultHttpClient();
 //    val httpget = new HttpGet("http://www.apache.org/");
     val httpget = new HttpGet("http://www.ryutsuu.biz/");
@@ -111,7 +128,8 @@ object HelloWorld {
         case Some(x) => x.toString
         case None => ""
       }, a.text)
-      println("""<?xml version="1.0" encoding="UTF-8"?>""" + toRss(list.toList).toString)
+      """<?xml version="1.0" encoding="UTF-8"?>""" + toRss(list.toList).toString
+      
 //       println(list.toString)
 
 //      val elem = XML.loadString(StringEscapeUtils.escapeHtml(inputStreamToString(entity.getContent())));
@@ -135,6 +153,5 @@ object HelloWorld {
 //            println(new String(EntityUtils.toString(entity).getBytes("UTF-8"), "UTF-8"));//print(instream.read());
 */
     }
-    println("こんにちわ。世界!!");
   }
 }
